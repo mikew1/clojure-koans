@@ -3,21 +3,33 @@
 
 (defn is-even? [n]
   (if (= n 0)
-    __
-    (___ (is-even? (dec n)))))
+    true
+    (not (is-even? (dec n)))))  ; hard to get head around, until realise
+                                ; that every call adds a not
+                                ; if it's even, dec is not, & so on.
+                                ; note complement operates on & returns functions
+                                ; not does so on values.
 
 (defn is-even-bigint? [n]
   (loop [n   n
          acc true]
     (if (= n 0)
-      __
+      acc                           ; a bit hard to grasp... not worrying for now.
       (recur (dec n) (not acc)))))
 
 (defn recursive-reverse [coll]
-  __)
+  (loop [coll coll             ; yucky with recur; skipping for now... (pasted)
+          reversed '()]        ; what would this do (cons (rest coll))
+         (if (empty? coll)
+           reversed
+           (recur (rest coll) (cons (first coll) reversed)))))
 
 (defn factorial [n]
-  __)
+  (loop [n n                  ; again, pasted, don't want to deal with recur form
+         res 1]               ; at present
+    (if (= 0 n)
+      res
+      (recur (dec n) (* n res)))))
 
 (meditations
   "Recursion ends with a base case"
@@ -27,7 +39,7 @@
   (= false (is-even? 1))
 
   "Having too many stack frames requires explicit tail calls with recur"
-  (= false (is-even-bigint? 100003N))
+  (= false (is-even-bigint? 100003N))            ; N is literal form of BigInt
 
   "Reversing directions is easy when you have not gone far"
   (= '(1) (recursive-reverse [1]))

@@ -1,7 +1,10 @@
 (ns koans.19-datatypes
   (:require [koan-engine.core :refer :all]))
+                            ; defstruct is seen in sierpinski,
+                            ; that's obsolete, replaced with defrecord.
+                            ; what are these anyway
 
-(defrecord Nobel [prize])
+(defrecord Nobel [prize])   ; looks like classname, property
 (deftype Pulitzer [prize])
 
 (defprotocol Award
@@ -11,35 +14,38 @@
   Award
   (present [this recipient]
     (print (str "Congratulations on your "
-                (:category this) " Oscar, "
+                (:category this) " Oscar, "  ; with defrecord, its keyword :category
                 recipient
                 "!"))))
 
 (deftype Razzie [category]
   Award
   (present [this recipient]
-    __))
+    (print (str "You're really the "
+                (.category this) ", "        ; with type, need to do .category
+                recipient
+                "... sorry."))))
 
 (meditations
   "Holding records is meaningful only when the record is worthy of you"
-  (= __ (.prize (Nobel. "peace")))
-
+  (= "peace" (.prize (Nobel. "peace")))  ; (Nobel. "peace") macroexpands to (new Nobel "peace")
+                                         ; so, .prize looks like it just gets the property
   "Types are quite similar"
-  (= __ (.prize (Pulitzer. "literature")))
+  (= "literature" (.prize (Pulitzer. "literature")))   ; DOT AFTER IS CONSTRUCTOR
 
   "Records may be treated like maps"
-  (= __ (:prize (Nobel. "physics")))
+  (= "physics" (:prize (Nobel. "physics")))
 
   "While types may not"
-  (= __ (:prize (Pulitzer. "poetry")))
+  (= nil (:prize (Pulitzer. "poetry")))
 
   "Further study reveals why"
-  (= __
+  (= [true false]
      (map map? [(Nobel. "chemistry")
                 (Pulitzer. "music")]))
 
   "Either sort of datatype can define methods in a protocol"
-  (= __
+  (= "Congratulations on your Best Picture Oscar, Evil Alien Conquerors!"
      (with-out-str (present (Oscar. "Best Picture") "Evil Alien Conquerors")))
 
   "Surely we can implement our own by now"
